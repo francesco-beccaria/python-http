@@ -12,6 +12,10 @@ spec:
       paths:
       - path: /
         backend:
+          {{- if .Values.service.name }}
+          serviceName: {{ .Values.service.name }}
+          {{- else }}
           serviceName: {{ template "fullname" . }}
+          {{- end }}
           servicePort: {{ .Values.service.externalPort }}
 {{- end -}}
