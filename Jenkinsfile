@@ -59,13 +59,13 @@ pipeline {
 
             sh 'export VERSION=`cat VERSION` && skaffold build -f skaffold.yaml'
 
-            sh "jx step post build --image $DOCKER_REGISTRY/$ORG/$APP_NAME:\$(cat VERSION)"
+            // sh "jx step post build --image $DOCKER_REGISTRY/$ORG/$APP_NAME:\$(cat VERSION)"
           }
         }
       }
       stage('Promote to Environments') {
         when {
-          branch 'master'
+          branch 'dev'
         }
         steps {
           dir ('./charts/python-http') {
@@ -77,6 +77,42 @@ pipeline {
 
               // promote through all 'Auto' promotion Environments
               sh 'jx promote -b --all-auto --timeout 1h --version \$(cat ../../VERSION)'
+            }
+          }
+        }
+      }
+      stage('Validate Environment') {
+        when {
+          branch 'staging'
+        }
+        agent {
+          label "jenkins-maven"
+        }
+        environment {
+          DEPLOY_NAMESPACE = "jx-staging"
+        }
+        steps {
+          container('maven') {
+            dir('env') {
+              sh 'jx step helm build'
+            }
+          }
+        }
+      }
+      stage('Update Environment') {
+        when {
+          branch 'staging'
+        }
+        agent {
+          label "jenkins-maven"
+        }
+        environment {
+          DEPLOY_NAMESPACE = "jx-staging"
+        }
+        steps {
+          container('maven') {
+            dir('env') {
+              sh 'jx step helm apply'
             }
           }
         }
