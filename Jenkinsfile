@@ -59,7 +59,7 @@ pipeline {
 
             sh 'export VERSION=`cat VERSION` && skaffold build -f skaffold.yaml'
 
-            // sh "jx step post build --image $DOCKER_REGISTRY/$ORG/$APP_NAME:\$(cat VERSION)"
+            sh "jx step post build --image $DOCKER_REGISTRY/$ORG/$APP_NAME:\$(cat VERSION)"
           }
         }
       }
@@ -93,7 +93,8 @@ pipeline {
         }
         steps {
           container('maven') {
-            dir('env') {
+            dir('./charts/python-http') {
+              sh 'git status'
               sh 'jx step helm build'
             }
           }
@@ -111,7 +112,8 @@ pipeline {
         }
         steps {
           container('maven') {
-            dir('env') {
+            dir('./charts/python-http') {
+              sh 'git status'
               sh 'jx step helm apply'
             }
           }
