@@ -93,7 +93,7 @@ pipeline {
         }
         steps {
           container('maven') {
-            dir('./charts/python-http') {
+            dir('env') {
               sh 'jx step helm build'
             }
           }
@@ -111,7 +111,7 @@ pipeline {
         }
         steps {
           container('maven') {
-            dir('./charts/python-http') {
+            dir('env') {
               sh 'jx step helm apply'
             }
           }
